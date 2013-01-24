@@ -18,7 +18,8 @@
   ],
   "devDependencies": {
     "mocha": "1.8.1",
-    "chai": "1.4.2"
+    "chai": "1.4.2",
+    "coffee-script": "1.4.0"
   },
   "author": "Vojta Jina <vojta.jina@gmail.com>",
   "license": "MIT"
