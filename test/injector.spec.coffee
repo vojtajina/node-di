@@ -87,6 +87,15 @@ describe 'injector', ->
       expect(injector.get 'fsModule').to.equal(require 'fs')
 
 
+    it 'should inject properties', ->
+      module = new Module
+      module.value 'config', {a: 1, b: {c: 2}}
+
+      injector = new Injector module
+      expect(injector.get 'config.a').to.equal 1
+      expect(injector.get 'config.b.c').to.equal 2
+
+
   describe 'invoke', ->
 
     it 'should resolve dependencies', ->
