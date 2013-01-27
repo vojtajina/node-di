@@ -102,6 +102,37 @@ describe 'injector', ->
       expect(injector.get '$injector').to.equal injector
 
 
+    it 'should give error with full path if no provider', ->
+      # a requires b requires c (not provided)
+      aFn = (b) -> 'a-value'
+      aFn.$inject = ['b']
+      bFn = (c) -> 'b-value'
+      bFn.$inject = ['c']
+
+      module = new Module
+      module.factory 'a', aFn
+      module.factory 'b', bFn
+
+      injector = new Injector [module]
+      expect(-> injector.get 'a').to.throw 'No provider for "c"! (Resolving: a -> b -> c)'
+
+
+    it 'should give error if circular dependency', ->
+      module = new Module
+      aFn = (b) -> 'a-value'
+      aFn.$inject = ['b']
+      bFn = (a) -> 'b-value'
+      bFn.$inject = ['a']
+
+      module = new Module
+      module.factory 'a', aFn
+      module.factory 'b', bFn
+
+      injector = new Injector [module]
+      expect(-> injector.get 'a').to.throw 'Can not resolve circular dependency! ' +
+                                           '(Resolving: a -> b -> a)'
+
+
   describe 'invoke', ->
 
     it 'should resolve dependencies', ->
