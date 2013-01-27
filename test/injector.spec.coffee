@@ -1,10 +1,10 @@
 expect = require('chai').expect
 
-Module = require '../lib/module'
-Injector = require '../lib/injector'
-
 
 describe 'injector', ->
+
+  Module = require '../lib/module'
+  Injector = require '../lib/injector'
 
   it 'should consume an object as a module', ->
     class BazType
