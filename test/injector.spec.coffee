@@ -6,17 +6,16 @@ Injector = require '../lib/injector'
 
 describe 'injector', ->
 
-  it 'should consume an array as a module', ->
+  it 'should consume an object as a module', ->
     class BazType
       constructor: -> @name = 'baz'
 
-    providers = [
-      ['foo', 'factory', -> 'foo-value']
-      ['bar', 'value', 'bar-value']
-      ['baz', 'type', BazType]
-    ]
+    module =
+      foo: ['factory', -> 'foo-value']
+      bar: ['value', 'bar-value']
+      baz: ['type', BazType]
 
-    injector = new Injector providers
+    injector = new Injector [module]
     expect(injector.get 'foo').to.equal 'foo-value'
     expect(injector.get 'bar').to.equal 'bar-value'
     expect(injector.get 'baz').to.be.an.instanceof BazType
@@ -33,7 +32,7 @@ describe 'injector', ->
       module.value 'bar', 'bar value'
       module.type 'baz', BazType
 
-      injector = new Injector module
+      injector = new Injector [module]
 
       expect(injector.get 'foo').to.deep.equal {name: 'foo'}
       expect(injector.get 'bar').to.equal 'bar value'
@@ -50,7 +49,7 @@ describe 'injector', ->
       module.value 'bar', 'bar value'
       module.type 'baz', BazType
 
-      injector = new Injector module
+      injector = new Injector [module]
 
       expect(injector.get 'foo').to.equal(injector.get 'foo')
       expect(injector.get 'bar').to.equal(injector.get 'bar')
@@ -73,7 +72,7 @@ describe 'injector', ->
       module.value 'baz', 'baz-value'
       module.value 'abc', 'abc-value'
 
-      injector = new Injector module
+      injector = new Injector [module]
       fooInstance = injector.get 'foo'
       expect(fooInstance.bar).to.deep.equal {baz: 'baz-value', abc: 'abc-value'}
       expect(fooInstance.baz).to.equal 'baz-value'
@@ -83,7 +82,7 @@ describe 'injector', ->
       module = new Module
       module.require 'fsModule', 'fs'
 
-      injector = new Injector module
+      injector = new Injector [module]
       expect(injector.get 'fsModule').to.equal(require 'fs')
 
 
@@ -91,14 +90,14 @@ describe 'injector', ->
       module = new Module
       module.value 'config', {a: 1, b: {c: 2}}
 
-      injector = new Injector module
+      injector = new Injector [module]
       expect(injector.get 'config.a').to.equal 1
       expect(injector.get 'config.b.c').to.equal 2
 
 
     it 'should provide $injector', ->
       module = new Module
-      injector = new Injector module
+      injector = new Injector [module]
 
       expect(injector.get '$injector').to.equal injector
 
@@ -115,7 +114,7 @@ describe 'injector', ->
       module.value 'baz', 'baz-value'
       module.value 'abc', 'abc-value'
 
-      injector = new Injector module
+      injector = new Injector [module]
 
       expect(injector.invoke bar).to.deep.equal {baz: 'baz-value', abc: 'abc-value'}
 
@@ -123,7 +122,7 @@ describe 'injector', ->
     it 'should invoke function on given context', ->
       context = {}
       module = new Module
-      injector = new Injector module
+      injector = new Injector [module]
 
       injector.invoke (-> expect(@).to.equal context), context
 
@@ -139,13 +138,13 @@ describe 'injector', ->
       module.value 'baz', 'baz-value'
       module.value 'abc', 'abc-value'
 
-      injector = new Injector module
+      injector = new Injector [module]
       expect(injector.instantiate Foo).to.deep.equal {abc: 'abc-value', baz: 'baz-value'}
 
 
     it 'should return returned value from constructor if an object returned', ->
       module = new Module
-      injector = new Injector module
+      injector = new Injector [module]
       returnedObj = {}
 
       ObjCls = -> returnedObj
