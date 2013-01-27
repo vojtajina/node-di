@@ -102,7 +102,7 @@ describe 'injector', ->
       expect(injector.get '$injector').to.equal injector
 
 
-    it 'should give error with full path if no provider', ->
+    it 'should throw error with full path if no provider', ->
       # a requires b requires c (not provided)
       aFn = (b) -> 'a-value'
       aFn.$inject = ['b']
@@ -117,7 +117,7 @@ describe 'injector', ->
       expect(-> injector.get 'a').to.throw 'No provider for "c"! (Resolving: a -> b -> c)'
 
 
-    it 'should give error if circular dependency', ->
+    it 'should throw error if circular dependency', ->
       module = new Module
       aFn = (b) -> 'a-value'
       aFn.$inject = ['b']
