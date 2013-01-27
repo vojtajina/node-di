@@ -170,6 +170,19 @@ describe 'injector', ->
                                              'Expected a function!'
 
 
+    it 'should auto parse arguments/comments if no $inject defined', ->
+      bar = `function(/* baz */ a, abc) {
+        return {baz: a, abc: abc};
+      }`
+
+      module = new Module
+      module.value 'baz', 'baz-value'
+      module.value 'abc', 'abc-value'
+
+      injector = new Injector [module]
+      expect(injector.invoke bar).to.deep.equal {baz: 'baz-value', abc: 'abc-value'}
+
+
   describe 'instantiate', ->
 
     it 'should resolve dependencies', ->
