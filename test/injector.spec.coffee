@@ -197,10 +197,3 @@ describe 'injector', ->
       expect(injector.instantiate ObjCls).to.equal returnedObj
       expect(injector.instantiate StringCls).to.be.an.instanceof StringCls
       expect(injector.instantiate NumberCls).to.be.an.instanceof NumberCls
-
-# useful message if not provided
-# error if circular dependency
-# provide $injector by default
-
-
-

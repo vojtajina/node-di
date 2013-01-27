@@ -13,4 +13,3 @@ describe 'module', ->
           .type('c', ->)
           .require('d', 'fs')
           .value('e', 'e-value')
-
