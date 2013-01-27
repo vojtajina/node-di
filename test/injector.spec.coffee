@@ -158,6 +158,18 @@ describe 'injector', ->
       injector.invoke (-> expect(@).to.equal context), context
 
 
+    it 'should throw error if a non function given', ->
+      injector = new Injector []
+
+      expect(-> injector.invoke 123).to.throw 'Can not invoke "123". Expected a function!'
+      expect(-> injector.invoke 'abc').to.throw 'Can not invoke "abc". Expected a function!'
+      expect(-> injector.invoke null).to.throw 'Can not invoke "null". Expected a function!'
+      expect(-> injector.invoke undefined).to.throw 'Can not invoke "undefined". ' +
+                                                    'Expected a function!'
+      expect(-> injector.invoke {}).to.throw 'Can not invoke "[object Object]". ' +
+                                             'Expected a function!'
+
+
   describe 'instantiate', ->
 
     it 'should resolve dependencies', ->
