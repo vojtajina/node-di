@@ -95,11 +95,11 @@ describe 'injector', ->
       expect(injector.get 'config.b.c').to.equal 2
 
 
-    it 'should provide $injector', ->
+    it 'should provide "injector"', ->
       module = new Module
       injector = new Injector [module]
 
-      expect(injector.get '$injector').to.equal injector
+      expect(injector.get 'injector').to.equal injector
 
 
     it 'should throw error with full path if no provider', ->
