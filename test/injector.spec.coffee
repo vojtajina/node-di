@@ -253,3 +253,28 @@ describe 'injector', ->
       child = injector.createChild [moduleChild]
 
       expect(-> child.get 'b').to.throw 'No provider for "c"! (Resolving: b -> c)'
+
+
+    it 'should force new instance in child', ->
+      moduleParent = new Module
+      moduleParent.factory 'b', (c) -> {c: c}
+      moduleParent.value 'c', 'c-parent'
+      injector = new Injector [moduleParent]
+
+      expect(injector.get 'b').to.deep.equal {c: 'c-parent'}
+
+      moduleChild = new Module
+      moduleChild.value 'c', 'c-child'
+
+      child = injector.createChild [moduleChild], ['b']
+
+      expect(child.get 'b').to.deep.equal {c: 'c-child'}
+
+
+    it 'should throw error if forced provider does not exist', ->
+      moduleParent = new Module
+      injector = new Injector [moduleParent]
+      moduleChild = new Module
+
+      expect(-> injector.createChild [], ['b']).to.throw 'No provider for "b". Can not use ' +
+                                                         'provider from the parent!'
