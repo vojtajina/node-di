@@ -210,3 +210,46 @@ describe 'injector', ->
       expect(injector.instantiate ObjCls).to.equal returnedObj
       expect(injector.instantiate StringCls).to.be.an.instanceof StringCls
       expect(injector.instantiate NumberCls).to.be.an.instanceof NumberCls
+
+
+  describe 'child', ->
+
+    it 'should inject from child', ->
+      moduleParent = new Module
+      moduleParent.value 'a', 'a-parent'
+
+      moduleChild = new Module
+      moduleChild.value 'a', 'a-child'
+      moduleChild.value 'd', 'd-child'
+
+      injector = new Injector [moduleParent]
+      child = injector.createChild [moduleChild]
+
+      expect(child.get 'd').to.equal 'd-child'
+      expect(child.get 'a').to.equal 'a-child'
+
+
+    it 'should inject from parent if not provided in child', ->
+      moduleParent = new Module
+      moduleParent.value 'a', 'a-parent'
+
+      moduleChild = new Module
+      moduleChild.factory 'b', (a) -> {a: a}
+
+      injector = new Injector [moduleParent]
+      child = injector.createChild [moduleChild]
+
+      expect(child.get 'b').to.deep.equal {a: 'a-parent'}
+
+
+    it 'should inject from parent but never use dependency from child', ->
+      moduleParent = new Module
+      moduleParent.factory 'b', (c) -> 'b-parent'
+
+      moduleChild = new Module
+      moduleChild.value 'c', 'c-child'
+
+      injector = new Injector [moduleParent]
+      child = injector.createChild [moduleChild]
+
+      expect(-> child.get 'b').to.throw 'No provider for "c"! (Resolving: b -> c)'
