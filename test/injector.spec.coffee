@@ -286,6 +286,15 @@ describe 'injector', ->
       expect(child.get 'b').to.deep.equal {c: 'c-child'}
 
 
+    it 'should force new instance using provider from grand parent', ->
+      # regression
+      moduleGrandParent = new Module
+      moduleGrandParent.value 'x', 'x-grand-parent'
+
+      injector = new Injector [moduleGrandParent]
+      grandChildInjector = injector.createChild([]).createChild([], ['x'])
+
+
     it 'should throw error if forced provider does not exist', ->
       moduleParent = new Module
       injector = new Injector [moduleParent]
