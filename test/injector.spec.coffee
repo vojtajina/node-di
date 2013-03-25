@@ -78,14 +78,6 @@ describe 'injector', ->
       expect(fooInstance.baz).to.equal 'baz-value'
 
 
-    it 'should require a node module', ->
-      module = new Module
-      module.require 'fsModule', 'fs'
-
-      injector = new Injector [module]
-      expect(injector.get 'fsModule').to.equal(require 'fs')
-
-
     it 'should inject properties', ->
       module = new Module
       module.value 'config', {a: 1, b: {c: 2}}

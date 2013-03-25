@@ -11,5 +11,4 @@ describe 'module', ->
     module.value('a', 'a-value')
           .factory('b', -> 'b-value')
           .type('c', ->)
-          .require('d', 'fs')
           .value('e', 'e-value')
