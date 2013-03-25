@@ -229,6 +229,13 @@ describe 'injector', ->
       expect(child.get 'a').to.equal 'a-child'
 
 
+    it 'should provide the child injector as "injector"', ->
+      injector = new Injector []
+      childInjector = injector.createChild []
+
+      expect(childInjector.get 'injector').to.equal childInjector
+
+
     it 'should inject from parent if not provided in child', ->
       moduleParent = new Module
       moduleParent.value 'a', 'a-parent'
