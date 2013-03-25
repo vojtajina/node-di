@@ -95,6 +95,14 @@ describe 'injector', ->
       expect(injector.get 'config.b.c').to.equal 2
 
 
+    it 'should inject dotted service if present', ->
+      module = new Module
+      module.value 'a.b', 'a.b value'
+
+      injector = new Injector [module]
+      expect(injector.get 'a.b').to.equal 'a.b value'
+
+
     it 'should provide "injector"', ->
       module = new Module
       injector = new Injector [module]
