@@ -294,3 +294,47 @@ describe 'injector', ->
 
       expect(-> injector.createChild [], ['b']).to.throw 'No provider for "b". Can not use ' +
                                                          'provider from the parent!'
+
+
+  describe 'private injector', ->
+
+    it 'should not publish private services', ->
+      module =
+        public:
+          car: ['factory', (_wheel) -> {w: _wheel}]
+        private:
+          _wheel: ['value', 'private-wheel']
+
+      injector = new Injector [module]
+
+      expect(injector.get 'car').to.deep.equal {w: 'private-wheel'}
+      expect(-> injector.get '_wheel').to.throw 'No provider for "_wheel"! (Resolving: _wheel)'
+
+
+    it 'should allow name conflicts in private services', ->
+      moduleA =
+        public:
+          truck: ['factory', (_wheel) -> {w: _wheel}]
+        private:
+          _wheel: ['value', 'truck-wheel']
+
+      moduleB =
+        public:
+          car: ['factory', (_wheel) -> {w: _wheel}]
+        private:
+          _wheel: ['value', 'car-wheel']
+
+      injector = new Injector [moduleA, moduleB]
+
+      expect(injector.get 'truck').to.deep.equal {w: 'truck-wheel'}
+      expect(injector.get 'car').to.deep.equal {w: 'car-wheel'}
+
+
+    it 'should allow just public services', ->
+      module =
+        public:
+          a: ['value', 12345]
+
+      injector = new Injector [module]
+
+      expect(injector.get 'a').to.equal 12345
