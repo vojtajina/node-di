@@ -1,6 +1,6 @@
 {
   "name": "di",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Dependency Injection for Node.js. Heavily inspired by AngularJS.",
   "main": "lib/index.js",
   "scripts": {
