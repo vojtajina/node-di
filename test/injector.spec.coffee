@@ -294,3 +294,72 @@ describe 'injector', ->
 
       expect(-> injector.createChild [], ['b']).to.throw 'No provider for "b". Can not use ' +
                                                          'provider from the parent!'
+
+
+  describe 'private modules', ->
+
+    it 'should only expose public bindings', ->
+      mA =
+        __exports__: ['publicFoo'],
+        'publicFoo': ['factory', (privateBar) -> {dependency: privateBar}]
+        'privateBar': ['value', 'private-value']
+
+      mB =
+        'bar': ['factory', (privateBar) -> null]
+        'baz': ['factory', (publicFoo) -> {dependency: publicFoo}]
+
+      injector = new Injector [mA, mB]
+      publicFoo = injector.get 'publicFoo'
+      expect(publicFoo).to.be.defined
+      expect(publicFoo.dependency).to.equal 'private-value'
+      expect(-> injector.get 'privateBar').to.throw 'No provider for "privateBar"! (Resolving: privateBar)'
+      expect(-> injector.get 'bar').to.throw 'No provider for "privateBar"! (Resolving: bar -> privateBar)'
+      expect(injector.get('baz').dependency).to.equal publicFoo
+
+
+    it 'should allow name collisions in private bindings', ->
+      mA =
+        __exports__: ['foo']
+        'foo': ['factory', (conflict) -> conflict]
+        'conflict': ['value', 'private-from-a']
+
+      mB =
+        __exports__: ['bar']
+        'bar': ['factory', (conflict) -> conflict]
+        'conflict': ['value', 'private-from-b']
+
+      injector = new Injector [mA, mB]
+      expect(injector.get 'foo').to.equal 'private-from-a'
+      expect(injector.get 'bar').to.equal 'private-from-b'
+
+
+    it 'should allow forcing new instance', ->
+      module =
+        __exports__: ['foo']
+        'foo': ['factory', (bar) -> {bar: bar}]
+        'bar': ['value', 'private-bar']
+
+      injector = new Injector [module]
+      firstChild = injector.createChild [], ['foo']
+      secondChild = injector.createChild [], ['foo']
+      fooFromFirstChild = firstChild.get 'foo'
+      fooFromSecondChild = secondChild.get 'foo'
+
+      expect(fooFromFirstChild).not.to.equal fooFromSecondChild
+      expect(fooFromFirstChild.bar).to.equal fooFromSecondChild.bar
+
+
+    it 'should load additional __modules__', ->
+      mB =
+        'bar': ['value', 'bar-from-other-module']
+
+      mA =
+        __exports__: ['foo']
+        __modules__: [mB]
+        'foo': ['factory', (bar) -> {bar: bar}]
+
+      injector = new Injector [mA]
+      foo = injector.get 'foo'
+
+      expect(foo).to.be.defined
+      expect(foo.bar).to.equal 'bar-from-other-module'
