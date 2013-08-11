@@ -17,12 +17,12 @@
     "injector"
   ],
   "devDependencies": {
-    "grunt": "~0.4.0rc5",
-    "grunt-simple-mocha": "~0.3.2",
-    "grunt-contrib-jshint": "~0.1.1rc5",
-    "mocha": "1.8.1",
-    "chai": "1.4.2",
-    "coffee-script": "1.4.0"
+    "grunt": "~0.4",
+    "grunt-simple-mocha": "~0.4",
+    "grunt-contrib-jshint": "~0.6",
+    "mocha": "~1.12",
+    "chai": "~1.7",
+    "coffee-script": "~1.6"
   },
   "author": "Vojta Jina <vojta.jina@gmail.com>",
   "license": "MIT"
