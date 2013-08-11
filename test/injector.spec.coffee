@@ -363,3 +363,48 @@ describe 'injector', ->
 
       expect(foo).to.be.defined
       expect(foo.bar).to.equal 'bar-from-other-module'
+
+
+    it 'should only create one private child injector', ->
+      m =
+        __exports__: ['foo', 'bar']
+        'foo': ['factory', (bar) -> {bar: bar}]
+        'bar': ['factory', (internal) -> {internal: internal}]
+        'internal': ['factory', -> {}]
+
+      injector = new Injector [m]
+      foo = injector.get 'foo'
+      bar = injector.get 'bar'
+
+      childInjector = injector.createChild [], ['foo', 'bar']
+      fooFromChild = childInjector.get 'foo'
+      barFromChild = childInjector.get 'bar'
+
+      expect(fooFromChild).to.not.equal foo
+      expect(barFromChild).to.not.equal bar
+      expect(fooFromChild.bar).to.equal barFromChild
+
+
+  describe 'scopes', ->
+    it 'should force new instances per scope', ->
+      Foo = ->
+      Foo.$scope = ['request']
+
+      createBar = -> {}
+      createBar.$scope = ['session']
+
+      m =
+        'foo': ['type', Foo]
+        'bar': ['factory', createBar]
+
+      injector = new Injector [m]
+      foo = injector.get 'foo'
+      bar = injector.get 'bar'
+
+      sessionInjector = injector.createChild [], ['session']
+      expect(sessionInjector.get 'foo').to.equal foo
+      expect(sessionInjector.get 'bar').to.not.equal bar
+
+      requestInjector = injector.createChild [], ['request']
+      expect(requestInjector.get 'foo').to.not.equal foo
+      expect(requestInjector.get 'bar').to.equal bar
