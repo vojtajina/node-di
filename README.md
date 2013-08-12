@@ -1,5 +1,19 @@
 ## Dependency Injection framework for Node.js
 
+### Why Dependency Injection ?
+There are two things - **Dependency Injection pattern** (aka Inversion of Control) and **Dependency Injection framework**.
+
+The Dependency Injection pattern is about separating the instantiation of objects from the actual logic and behavior that they encapsulate. This pattern has many benefits such as:
+
+- **explicit dependencies** - all dependencies are passed in as constructor arguments, which makes it easy to understand how particular object depends on the rest of the environment,
+- **code reuse** - such an object is much easier to reuse in other environments, because it is not coupled to a specific implementation of its dependencies,
+- and **much easier to test**, because testing is essentially about instantiating a single object without the rest of the environment.
+
+Following this pattern is, of course, possible without any framework.
+
+However, if you do follow the Dependency Injection pattern, you typically end up with some kind of nasty `main()` method, where you instantiate all the objects and wire them together. The Dependency Injection framework saves you from this boilerplate. **It makes wiring the application declarative rather than imperative.** Each component declares its dependencies and the framework does transitively resolve these dependencies...
+
+
 ### Example
 
 ```js
