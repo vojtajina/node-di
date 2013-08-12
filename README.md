@@ -103,6 +103,7 @@ var module = {
 - no decorators (maybe not yet?)
 - service -> type
 - child injectors
+- private modules
 
 
 ---------
