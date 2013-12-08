@@ -183,6 +183,26 @@ describe 'injector', ->
       expect(injector.invoke bar).to.deep.equal {baz: 'baz-value', abc: 'abc-value'}
 
 
+    it 'should support invokation of asynchronous modules', (finished) ->
+      @timeout 500
+
+      bar = `function(baz, abc) {
+        var done = this.async();
+        done({baz: baz, abc: abc});
+      }`
+
+      module = new Module
+      module.value 'baz', 'baz-value'
+      module.value 'abc', 'abc-value'
+
+      injector = new Injector [module]
+
+      done = (result) ->
+        expect(result).to.deep.equal {baz: 'baz-value', abc: 'abc-value'}
+        do finished
+
+      injector.invoke bar, null, done
+
   describe 'instantiate', ->
 
     it 'should resolve dependencies', ->
