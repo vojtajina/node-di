@@ -18,37 +18,58 @@ However, if you do follow the Dependency Injection pattern, you typically end up
 
 ```js
 var Car = function(engine) {
-  this.start = function() {
-    engine.start();
-  };
+  this.engine = engine;
+};
+Car.prototype.start = function() {
+  this.engine.start();
+};
+Car.prototype.info = function() {
+  console.log('Car ' + (this.engine.running ? 'running' : 'stopped') + ' with ' + this.engine.power + 'hp');
 };
 
 var createPetrolEngine = function(power) {
   return {
+    power : power,
+    nitro : function () {
+      this.power *= 1.5;
+    },
     start: function() {
-      console.log('Starting engine with ' + power + 'hp');
+      this.running = true;
+      console.log('Starting engine with ' + this.power + 'hp');
     }
   };
 };
 
 
+var di = require('di');
+
 // a module is just a plain JavaScript object
 // it is a recipe for the injector, how to instantiate stuff
 var module = {
   // if an object asks for 'car', the injector will call new Car(...) to produce it
-  'car': ['type', Car],
+  car: di.type(Car),
   // if an object asks for 'engine', the injector will call createPetrolEngine(...) to produce it
-  'engine': ['factory', createPetrolEngine],
+  engine: di.factory(createPetrolEngine),
   // if an object asks for 'power', the injector will give it number 1184
-  'power': ['value', 1184] // probably Bugatti Veyron
+  power: 1184 // probably Bugatti Veyron
 };
 
 
-var di = require('di');
 var injector = new di.Injector([module]);
 
 injector.invoke(function(car) {
+  car.info();
   car.start();
+  car.info();
+  // power boost
+  car.engine.nitro();
+  // engine with moar power
+  car.info();
+});
+
+injector.invoke(function(car) {
+  // same car
+  car.info();
 });
 ```
 For more examples, check out [the tests](/vojtajina/node-di/blob/master/test/injector.spec.coffee). You can also check out [Karma](https://github.com/karma-runner/karma) and its plugins for more complex examples.
@@ -60,7 +81,7 @@ For more examples, check out [the tests](/vojtajina/node-di/blob/master/test/inj
 To produce the instance, `Constructor` will be called with `new` operator.
 ```js
 var module = {
-  'engine': ['type', DieselEngine]
+  engine: di.type(DieselEngine)
 };
 ```
 
@@ -68,7 +89,7 @@ var module = {
 To produce the instance, `factoryFn` will be called (without any context) and its result will be used.
 ```js
 var module = {
-  'engine': ['factory', createDieselEngine]
+  engine: di.factory(createDieselEngine)
 };
 ```
 
@@ -76,7 +97,7 @@ var module = {
 Register the final value.
 ```js
 var module = {
-  'power': ['value', 1184]
+  power: 1184
 };
 ```
 
@@ -104,7 +125,7 @@ var Engine = function(/* config.engine.power */ power) {
 };
 
 var module = {
-  'config': ['value', {engine: {power: 1184}, other : {}}]
+  config: {engine: {power: 1184}, other : {}}
 };
 ```
 
