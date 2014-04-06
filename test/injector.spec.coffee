@@ -15,11 +15,25 @@ describe 'injector', ->
       bar: ['value', 'bar-value']
       baz: ['type', BazType]
 
-    injector = new Injector [module]
+    injector = new Injector module
     expect(injector.get 'foo').to.equal 'foo-value'
     expect(injector.get 'bar').to.equal 'bar-value'
     expect(injector.get 'baz').to.be.an.instanceof BazType
 
+  it 'should consume multiple objects as modules', ->
+    class BazType
+
+    module1 =
+      foo: ['factory', -> 'foo-value']
+      baz: ['type', BazType]
+    
+    module2 =
+      bar: ['value', 'bar-value']
+
+    injector = new Injector [module1, module2]
+    expect(injector.get 'foo').to.equal 'foo-value'
+    expect(injector.get 'bar').to.equal 'bar-value'
+    expect(injector.get 'baz').to.be.an.instanceof BazType
 
   describe 'get', ->
 

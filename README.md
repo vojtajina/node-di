@@ -45,7 +45,7 @@ var module = {
 
 
 var di = require('di');
-var injector = new di.Injector([module]);
+var injector = new di.Injector(module);
 
 injector.invoke(function(car) {
   car.start();
