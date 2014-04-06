@@ -3,6 +3,7 @@ expect = require('chai').expect
 
 describe 'injector', ->
 
+  di = require '../lib'
   Module = require '../lib/module'
   Injector = require '../lib/injector'
 
@@ -11,9 +12,9 @@ describe 'injector', ->
       constructor: -> @name = 'baz'
 
     module =
-      foo: ['factory', -> 'foo-value']
-      bar: ['value', 'bar-value']
-      baz: ['type', BazType]
+      foo: di.factory -> 'foo-value'
+      baz: di.type BazType
+      bar: 'bar-value'
 
     injector = new Injector [module]
     expect(injector.get 'foo').to.equal 'foo-value'
@@ -301,12 +302,12 @@ describe 'injector', ->
     it 'should only expose public bindings', ->
       mA =
         __exports__: ['publicFoo'],
-        'publicFoo': ['factory', (privateBar) -> {dependency: privateBar}]
-        'privateBar': ['value', 'private-value']
+        'publicFoo': di.factory (privateBar) -> dependency: privateBar
+        'privateBar': 'private-value'
 
       mB =
-        'bar': ['factory', (privateBar) -> null]
-        'baz': ['factory', (publicFoo) -> {dependency: publicFoo}]
+        'bar': di.factory (privateBar) -> null
+        'baz': di.factory (publicFoo) -> dependency: publicFoo
 
       injector = new Injector [mA, mB]
       publicFoo = injector.get 'publicFoo'
@@ -320,13 +321,13 @@ describe 'injector', ->
     it 'should allow name collisions in private bindings', ->
       mA =
         __exports__: ['foo']
-        'foo': ['factory', (conflict) -> conflict]
-        'conflict': ['value', 'private-from-a']
+        'foo': di.factory (conflict) -> conflict
+        'conflict': 'private-from-a'
 
       mB =
         __exports__: ['bar']
-        'bar': ['factory', (conflict) -> conflict]
-        'conflict': ['value', 'private-from-b']
+        'bar': di.factory (conflict) -> conflict
+        'conflict': 'private-from-b'
 
       injector = new Injector [mA, mB]
       expect(injector.get 'foo').to.equal 'private-from-a'
@@ -336,8 +337,8 @@ describe 'injector', ->
     it 'should allow forcing new instance', ->
       module =
         __exports__: ['foo']
-        'foo': ['factory', (bar) -> {bar: bar}]
-        'bar': ['value', 'private-bar']
+        'foo': di.factory (bar) -> { bar }
+        'bar': 'private-bar'
 
       injector = new Injector [module]
       firstChild = injector.createChild [], ['foo']
@@ -351,12 +352,12 @@ describe 'injector', ->
 
     it 'should load additional __modules__', ->
       mB =
-        'bar': ['value', 'bar-from-other-module']
+        'bar': 'bar-from-other-module'
 
       mA =
         __exports__: ['foo']
         __modules__: [mB]
-        'foo': ['factory', (bar) -> {bar: bar}]
+        foo: di.factory (bar) -> { bar }
 
       injector = new Injector [mA]
       foo = injector.get 'foo'
@@ -368,9 +369,9 @@ describe 'injector', ->
     it 'should only create one private child injector', ->
       m =
         __exports__: ['foo', 'bar']
-        'foo': ['factory', (bar) -> {bar: bar}]
-        'bar': ['factory', (internal) -> {internal: internal}]
-        'internal': ['factory', -> {}]
+        'foo': di.factory (bar) -> { bar }
+        'bar': di.factory (internal) -> { internal }
+        'internal': di.factory -> {}
 
       injector = new Injector [m]
       foo = injector.get 'foo'
@@ -394,8 +395,8 @@ describe 'injector', ->
       createBar.$scope = ['session']
 
       m =
-        'foo': ['type', Foo]
-        'bar': ['factory', createBar]
+        'foo': di.type Foo
+        'bar': di.factory createBar
 
       injector = new Injector [m]
       foo = injector.get 'foo'
