@@ -1,3 +1,8 @@
+#### THIS PROJECT IS DEPRECATED, please consider using [angular/di](https://github.com/angular/di.js) instead.
+I don't actively maintain this project, in favor of angular/di, which is heavily influenced by node-di and thus the migration should be easy. Eventually angular/di will be published to NPM as di@2.0.
+
+---------
+
 ## Dependency Injection framework for Node.js
 
 ### Why Dependency Injection ?
